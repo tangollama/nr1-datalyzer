@@ -112,5 +112,6 @@ export default class Analyzer extends React.Component {
         </GridItem>
       </Grid>
     </>
+
   }
 }

@@ -96,7 +96,7 @@ export default class RootNerdlet extends React.Component {
         </StackItem>
       </Stack>
       <Analyzer {...this.props} {...this.state} />
-      </>
+    </>
   }
 
   renderEntityDatalyzer() {
