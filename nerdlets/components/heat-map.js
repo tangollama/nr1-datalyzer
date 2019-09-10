@@ -78,9 +78,18 @@ export default class Heatmap extends React.Component {
     selection: PropTypes.string,
 
     /**
-     * callback for formatting the tooltip that appears over a node. Example
+     * callback for formatting a value to appear in tooltips and in the legend
      * ```js
-     * formatLabel=({name, value} => `${name}: ${Math.round(value*100)}%`)
+     * formatValue=(value) => `${Math.round(value*1000)}ms`
+     * ```
+     */
+    formatValue: PropTypes.func,
+
+    /**
+     * callback for formatting a the label to appear in tooltips
+     * ```js
+     * // show first few characters of a really long guid string
+     * formatLabel=(label) => label.slice(0..6)+"..."
      * ```
      */
     formatLabel: PropTypes.func,
@@ -89,7 +98,7 @@ export default class Heatmap extends React.Component {
      * callback when a the title is clicked. Title's value is passed. If 
      * a grouped HeatMap, the title value will be the group's name (e.g. host in the above example)
      */
-    onSelect: PropTypes.func,
+    onClickTitle: PropTypes.func,
   }
 
   render() {
@@ -121,11 +130,15 @@ export default class Heatmap extends React.Component {
 }
 
 function Node(props) {
-  const { name, value, max, selected, onClick, formatLabel } = props
+  const { name, value, max, selected, onClick, formatValue, formatLabel } = props
 
   const normalizedValue = Math.max(Math.min(value / max, 1), 0)
   const color = heatMapColor(normalizedValue)
-  const toolTipText = formatLabel ? formatLabel({ name, value }) : `${name}: ${value}`
+
+  const formattedValue = formatValue ? formatValue(value) : value
+  const formattedLabel = formatLabel ? formatLabel(name) : name
+
+  const toolTipText = `${formattedLabel}: ${formattedValue}`
   const className = `node ${selected && 'selected'}`
 
   return <Tooltip text={toolTipText}>
@@ -134,21 +147,23 @@ function Node(props) {
 }
 
 function SingleHeatmap(props) {
-  const { title, formatLabel, selection, onSelect, data, max, onClickTitle, showLegend } = props
+  const { title, selection, onSelect, data, max, onClickTitle, showLegend } = props
 
   const titleStyle = `title ${onClickTitle && "clickable"}`
   return <div className="heat-map">
     <div className="header">
       <div className={titleStyle} onClick={() => onClickTitle(title)}>
-        {showLegend && <Legend title={title || "Legend"} max={max}/>}
-        {!showLegend && title}
+        {title}
+      </div>
+      <div>
+        {showLegend && <Legend {...props}/>}
       </div>
     </div>
     <div className="grid">
       {data.map(datum => {        
         const selected = datum.name == selection
-        return <Node key={datum.name} formatLabel={formatLabel} {...datum} selected={selected}
-          max={max} onClick={() => onSelect(datum.name)} />
+        return <Node key={datum.name} {...props} {...datum} selected={selected}
+            onClick={() => onSelect(datum.name)} />
       })}
     </div>
   </div>
@@ -200,7 +215,7 @@ function prepare({data, max}) {
 function heatMapColor(value) {
   if(value > 1) throw "heatMapColor: value must be in range (0..1)"
 
-  const h = (1 - value) * 80
+  const h = (1 - value) * 70+20
   const s = 100
   const l = 40
 
@@ -224,10 +239,10 @@ function ValueSpectrum() {
 /**
  * renders a Heatmap legend as a color spectrum
  */
-export function Legend({ title, max }) {
+export function Legend({ title, max, formatValue }) {
+  if(formatValue) max=formatValue(max)
   return <div className="heat-map-legend">
-    <span>{title}</span>
-    <span>0</span>
+    <span className="left">0</span>
     <ValueSpectrum />
     <span>{max}</span>
   </div>
