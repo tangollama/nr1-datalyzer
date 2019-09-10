@@ -13,10 +13,15 @@ export function getFilterWhere(props, filters) {
       }
     })
 
-  if(props.entity && props.entity.domain == 'INFRA') {
+  const domain = props.entity && props.entity.domain
+  if(domain == 'INFRA') {
     clauses.push(`entityGuid = '${props.entity.guid}'`)
   }
-  else if(props.entity) {
+  // FIXME for some reason mobile events no longer sending in app id
+  else if(domain == 'MOBILE') {
+    clauses.push(`appName = '${props.entity.name}'`)
+  }
+  else if(domain) {
     clauses.push(`appId = ${props.entity.applicationId}`)
   }
   if (clauses.length > 0) {

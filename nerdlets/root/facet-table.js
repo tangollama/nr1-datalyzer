@@ -4,6 +4,11 @@ import Heatmap from '../components/heat-map'
 
 import getQuery from "./get-query";
 
+// TODO make this smarter over time. Round to significant digits or something. 
+function smartFormat(value) {
+  return value == Math.round(value) ? value : value.toFixed(3)
+}
+
 export default class FacetTable extends React.Component {
   constructor(props) {
     super(props)
@@ -23,6 +28,8 @@ export default class FacetTable extends React.Component {
       setFilter(key, value)
     }
 
+    const formatLabel=({name, value}) => `${name}: ${smartFormat(value)}`
+
     /* FIXME! @danielgolden I am having trouble with vertical sizing
      * now that the table is enclosed in tabs. */
     return <div>
@@ -34,8 +41,10 @@ export default class FacetTable extends React.Component {
               onClickTable={onClickRow} />
           </div>
         </TabsItem>
-        <TabsItem value="heatmap" label="Heat Map">
+        <TabsItem value="heatmap" label="Heat Map" className="primary-heat-map">
           <Heatmap accountId={account.id} query={query}
+            formatLabel={formatLabel} showLegend
+            max={(max) => Math.ceil(max)}
             onSelect={(value) => setFilter(dimension, value)} />
         </TabsItem>
       </Tabs>

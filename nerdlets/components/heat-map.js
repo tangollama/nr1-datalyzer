@@ -61,8 +61,11 @@ export default class Heatmap extends React.Component {
     /**
      * default max value for "100%". If any value returned by the query exceeds this,
      * then max is bumped up to that maximum.
+     * 
+     * If max is a function, then this function will be invoked with the computed
+     * max value, enabling the client to "pin" this max to a round number 
      */
-    max: PropTypes.number,
+    max: PropTypes.any,
 
     /**
      * callback when a node is selected, with that node's value (facet name)
@@ -131,19 +134,20 @@ function Node(props) {
 }
 
 function SingleHeatmap(props) {
-  const { title, formatLabel, selection, onSelect, data, max, onClickTitle } = props
+  const { title, formatLabel, selection, onSelect, data, max, onClickTitle, showLegend } = props
 
   const titleStyle = `title ${onClickTitle && "clickable"}`
   return <div className="heat-map">
     <div className="header">
       <div className={titleStyle} onClick={() => onClickTitle(title)}>
-        {title}
+        {showLegend && <Legend title={title || "Legend"} max={max}/>}
+        {!showLegend && title}
       </div>
     </div>
     <div className="grid">
       {data.map(datum => {        
         const selected = datum.name == selection
-        return <Node formatLabel={formatLabel} {...datum} selected={selected}
+        return <Node key={datum.name} formatLabel={formatLabel} {...datum} selected={selected}
           max={max} onClick={() => onSelect(datum.name)} />
       })}
     </div>
@@ -165,12 +169,12 @@ function GroupedHeatMap(props) {
 }
 
 function prepare({data, max}) {
-  max = max || 0
+  let maxValue = 0
   const isMultiFacet = Array.isArray(data.metadata.facet)
 
   data = data.facets.map(facet => {
     const value = Object.values(facet.results[0])[0]
-    if(value > max) max = value
+    if(value > maxValue) maxValue = value
 
     let name = isMultiFacet ? facet.name[1] : facet.name
     if(!name) name = "<N/A>"
@@ -181,8 +185,16 @@ function prepare({data, max}) {
     }
     return dataPoint    
   })
+
+  if(typeof(max) == "function") {
+    maxValue = max(maxValue)
+  }
+  else if(max) {
+    maxValue = Math.max(max, maxValue)
+  }
+
   data = _.sortBy(data, "name")
-  return {data, max, isMultiFacet}
+  return {data, max: maxValue, isMultiFacet}
 }
 
 function heatMapColor(value) {
@@ -214,7 +226,7 @@ function ValueSpectrum() {
  */
 export function Legend({ title, max }) {
   return <div className="heat-map-legend">
-    <span>{title}:</span>
+    <span>{title}</span>
     <span>0</span>
     <ValueSpectrum />
     <span>{max}</span>
