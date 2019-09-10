@@ -1,5 +1,5 @@
 import React from "react"
-import { Stack, StackItem, Grid, GridItem } from "nr1"
+import { Grid, GridItem } from "nr1"
 
 import DimensionPicker from "./dimension-picker"
 import Chart from "./chart"

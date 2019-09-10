@@ -37,7 +37,7 @@ export default class RootNerdlet extends React.Component {
       const { data } = await NerdGraphQuery.query({ query: gql })
 
       const { accounts } = data.actor
-      const account = accounts.length > 0 && accounts[0]
+      const account = accounts.length > 0 && accounts.find(a => a.id == 1)
       this.setState({ accounts, account })
     }
   }

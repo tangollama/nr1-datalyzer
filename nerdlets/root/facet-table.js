@@ -1,7 +1,8 @@
 import React from "react"
-import {TableChart} from "nr1"
+import {Tabs, TabsItem, TableChart} from "nr1"
+import Heatmap from '../components/heat-map'
 
-import getMetricQuery  from "./get-query";
+import getQuery  from "./get-query";
 
 export default class FacetTable extends React.Component {
   constructor(props) {
@@ -15,15 +16,29 @@ export default class FacetTable extends React.Component {
     const {account, setFilter, attribute, dimension} = this.props
     if(!attribute || !dimension) return <div/>
     
-    const query = getMetricQuery(this.props, this.state)
+    const query = getQuery(this.props, this.state)
     const onClickRow = (key, row) => {      
       const value = row[key]
 
       setFilter(key, value)
     }
 
-    return <>
-      <TableChart className="primary-table" accountId={account.id} query={query} onClickTable={onClickRow} />
-    </>
+    console.log(query)
+    return <div>
+      <Tabs>
+      <TabsItem itemKey="table" label="Table">
+        <div style={{height: "800px"}}>
+          <TableChart className="primary-table" 
+              accountId={account.id} query={query} 
+              onClickTable={onClickRow} />
+        </div>
+      </TabsItem>
+      <TabsItem itemKey="heatmap" label="Heat Map">
+        <Heatmap accountId={account.id} query={query} 
+          onSelect={(value) => setFilter(dimension, value)}/>
+      </TabsItem>
+    </Tabs>
+      </div>
+    
   }
 }

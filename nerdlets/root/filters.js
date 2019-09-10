@@ -9,7 +9,7 @@ function Filter({ attribute, value, removeFilter }) {
     </span>
     <Button
       iconType="interface_operations_remove_v-alternate"
-      sizeType="slim"
+      sizeType="small"
       type="plainNeutral"
       onClick={() => removeFilter(attribute, value)}
     />

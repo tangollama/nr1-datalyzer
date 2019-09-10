@@ -1,0 +1,68 @@
+
+.heat-map {
+  margin: 12px;
+  border-radius: 6px;
+  padding: 12px;
+  border: 1px dotted #aaaaaa;
+  background-color: white;
+
+  .header {
+    .title {
+      font-size: 18px;
+      font-weight: 400;
+    }
+
+    .clickable {
+      color: #005054;      
+    }
+    .clickable:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+  
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+    padding-top: 12px;
+  
+    .node {
+      width: 12px;
+      height: 16px;
+      border: 1px solid #aaaaaa;
+      margin: 2px;
+    }
+
+    .selected {
+      border: 3px solid #222222;
+      margin: -2px;
+      width: 16px;
+      height: 20px;
+    }
+  }   
+}
+
+.heat-map-legend {
+  width: 100%;
+  display: flex;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px dotted #eeeeee;
+  
+  span {
+    padding-left: 8px;
+    font-size: 18px;
+    padding-right: 8px;
+    padding-top: 1px;
+  }
+}
+
+.heat-map-spectrum {
+  display: flex;
+  height: 24px;
+  width: 100%;
+
+  .slice {
+    width: 0.5%
+  }
+}
