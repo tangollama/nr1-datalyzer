@@ -2,7 +2,7 @@ import React from "react"
 import { Tabs, TabsItem, Spinner } from 'nr1'
 
 import nrdbQuery from '../lib/nrdb-query'
-import quote from '../lib/quote'
+import quote from '../lib/quote-attribute'
 import {timePickerNrql} from  './get-query'
 import Attribute from './attribute'
 
