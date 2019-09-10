@@ -2,7 +2,7 @@ import React from "react"
 import { Stack, StackItem } from 'nr1'
 import Select from 'react-select'
 
-import quote from '../../lib/quote'
+import quote from '../../lib/quote-attribute'
 import nrdbQuery from '../../lib/nrdb-query'
 
 function label(attr) {
