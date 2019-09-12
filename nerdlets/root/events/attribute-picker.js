@@ -1,61 +1,69 @@
-import React from "react"
-import { Stack, StackItem } from 'nr1'
-import Select from 'react-select'
+import React from 'react';
+import PropTypes from 'prop-types';
+import Select from 'react-select';
 
-import quote from '../../lib/quote'
-import nrdbQuery from '../../lib/nrdb-query'
+import quote from '../../lib/quote';
+import nrdbQuery from '../../lib/nrdb-query';
 
 function label(attr) {
-  if(attr == "__count__") return "count(*)"
-  return attr
+  if (attr === '__count__') return 'count(*)';
+  return attr;
 }
 export default class AttributePicker extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {}
+  static propTypes = {
+    dataType: PropTypes.string,
+    account: PropTypes.string,
+    attribute: PropTypes.object,
+    setAttribute: PropTypes.func,
+    eventType: PropTypes.string
   }
 
-  componentDidUpdate({eventType, dataType}) {
-    if(eventType != this.props.eventType ||
-      dataType != this.props.dataType) {
-      this.loadAttributes()
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  componentDidUpdate({ eventType, dataType }) {
+    if (eventType !== this.props.eventType ||
+      dataType !== this.props.dataType) {
+      this.loadAttributes();
     }
   }
 
   async loadAttributes() {
-    const {account, eventType, setAttribute} = this.props
-    const nrql = `SELECT keySet() FROM ${quote(eventType)}`
+    const { account, eventType, setAttribute } = this.props;
+    const nrql = `SELECT keySet() FROM ${quote(eventType)}`;
 
     // simplify the menu by filtering out all string attributes, as well
     // as numeric attributes that end in "_id" or "Id" (which are assumed
     // to be identifiers and not really worth plotting as numerical data)
     const attributes = (await nrdbQuery(account.id, nrql))
-      .filter(a => a.type == 'numeric')
+      .filter(a => a.type === 'numeric')
       .map(a => a.key)
-      .filter(a => !(a.endsWith("_id") || a.endsWith("Id") || a == "timestamp"))
+      .filter(a => !(a.endsWith('_id') || a.endsWith('Id') || a === 'timestamp'));
 
-    attributes.unshift("__count__")
+    attributes.unshift('__count__');
 
-    this.setState({attributes})
-    setAttribute(attributes[0])
+    this.setState({ attributes });
+    setAttribute(attributes[0]);
   }
 
   render() {
-    const {attributes} = this.state
-    const {attribute, setAttribute} = this.props
-    if(!attributes) return <div/>
+    const { attributes } = this.state;
+    const { attribute, setAttribute } = this.props;
+    if (!attributes) return <div />;
 
-    const options = attributes.map(o => { return { value: o, label: label(o) }})
+    const options = attributes.map((o) => { return { value: o, label: label(o) }; });
     return (
       <div className="react-select-input-group">
         <label>Plot</label>
         <Select
           options={options}
-          value={{value: attribute, label: label(attribute)}}
-          onChange={(a) => setAttribute(a.value)}
+          value={{ value: attribute, label: label(attribute) }}
+          onChange={a => setAttribute(a.value)}
           classNamePrefix="react-select"
-          />
+        />
       </div>
-    )
+    );
   }
 }
