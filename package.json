@@ -22,8 +22,7 @@
     "react-dom": "^16.6.3",
     "react-select": "^3.0.4"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "browserslist": [
     "last 2 versions",
     "not ie < 11",
